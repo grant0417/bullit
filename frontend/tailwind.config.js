@@ -9,6 +9,9 @@ module.exports = {
         usfSand: '#EDEBD1',
         usfEvergreen: '#005432',
       },
+      maxWidth: {
+        '20': '5rem',
+      }
     },
   },
   variants: {
