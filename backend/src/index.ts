@@ -58,6 +58,7 @@ async function startApp(port: number) {
       "posts.time_posted",
       "users.username",
       "roles.name as role",
+      "posts.approved",
       "COALESCE((SELECT sum(post_votes.vote_value) FROM post_votes WHERE post_votes.post_id = posts.id), 0) as votes",
     ];
 
@@ -115,7 +116,6 @@ async function startApp(port: number) {
             let q = createQuery(
               [
                 ...sqlColumns,
-                "posts.approved",
                 "(SELECT vote_value FROM post_votes WHERE post_id = posts.id AND voter_id = (SELECT id FROM users WHERE username = $1)) as current_vote",
               ],
               sqlFrom,
@@ -160,20 +160,18 @@ async function startApp(port: number) {
         })
         .catch((err) => {});
     } else {
-      pool
-        .query(
-          createQuery([...sqlColumns], sqlFrom, {
-            where: [
-              ...sqlWhere,
-              ...(user ? [`users.username = '${user}'`] : []),
-              "posts.approved = TRUE",
-            ],
-            orderBy: [...sqlOrder],
-          })
-        )
-        .then((result) => {
-          res.json(result.rows);
-        });
+      const q = createQuery(sqlColumns, sqlFrom, {
+        where: [
+          ...sqlWhere,
+          ...(user ? [`users.username = '${user}'`] : []),
+          "posts.approved = TRUE",
+        ],
+        groupBy: sqlGroupBy,
+        orderBy: [...sqlOrder],
+      });
+      pool.query(q).then((result) => {
+        res.json(result.rows);
+      });
     }
 
     // res.send([

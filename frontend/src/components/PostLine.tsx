@@ -13,6 +13,7 @@ import useStore from "../Store";
 import axios from "axios";
 import { useMutation } from "react-query";
 import queryClient from "../QueryClient";
+import ReactTooltip from "react-tooltip";
 
 export function PostLine({ post }: { post: any }) {
   const role = useStore((state) => state.role);
@@ -43,12 +44,17 @@ export function PostLine({ post }: { post: any }) {
       <Votes id={post.id} votes={post.votes} currentVote={post.current_vote} />
       <div className="flex flex-col justify-center">
         <div className="flex flex-row flex-wrap gap-1 items-center">
-          {post.approved !== undefined &&
-            (post.approved ? (
-              <ShieldCheckIcon className="h-5 w-5 text-green-400" />
-            ) : (
-              <ShieldExclamationIcon className="h-5 w-5 text-yellow-400" />
-            ))}
+          {(role === "admin" || role === "mod") && post.approved && (
+            <ShieldCheckIcon className="h-5 w-5 text-green-400" />
+          )}
+          {post.approved === false && (
+            <>
+              <a data-tip="This post is pending approval.">
+                <ShieldExclamationIcon className="h-5 w-5 text-yellow-400" />
+              </a>
+              <ReactTooltip place="top" type="dark" effect="solid" />
+            </>
+          )}
           <div>
             {post.url ? (
               <a
@@ -81,8 +87,7 @@ export function PostLine({ post }: { post: any }) {
         </div>
         <div>
           <div className="text-sm text-gray-700 flex flex-row gap-0.5 items-baseline flex-wrap">
-            <UserLine username={post.username} role={post.role} />{" "}
-            posted{" "}
+            <UserLine username={post.username} role={post.role} /> posted{" "}
             <time
               dateTime={post.time_posted}
               title={dayjs(post.time_posted).toString()}
@@ -101,7 +106,7 @@ export function PostLine({ post }: { post: any }) {
               Comments
             </div>
           </Link>
-          {(post.approved === false) && (
+          {post.approved === false && (role === "admin" || role === "mod") && (
             <>
               <div className="text-sm text-gray-700">·</div>
               <button

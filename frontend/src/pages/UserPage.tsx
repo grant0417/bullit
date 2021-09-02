@@ -8,6 +8,7 @@ import useStore from "../Store";
 import { PencilAltIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 import SortSelector from "../components/SortSelector";
+import EditableDescription from "../components/EditableDescription";
 
 export function UserPage() {
   const { name } = useParams<{ name: string }>();
@@ -29,9 +30,9 @@ export function UserPage() {
       {userQuery.data ? (
         <div className="sm:mx-auto max-w-4xl flex flex-col divide-y">
           <div className="sm:border sm:rounded bg-white py-2 px-4 flex flex-col gap-1">
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row flex-wrap justify-between items-center gap-1">
               <div className="flex flex-row items-center gap-0.5">
-                <div className="text-2xl">{userQuery.data.username}</div>
+                <div className="text-2xl pl-1">{userQuery.data.username}</div>
                 {(userQuery.data.role === "admin" ||
                   userQuery.data.role === "mod" ||
                   userQuery.data.role === "approved") && (
@@ -41,18 +42,13 @@ export function UserPage() {
               {/* <div className="text-gray-700">
                       Graduation Semester: {dayjs(postsQuery.data.time_created).format( "MMMM YYYY")}
                     </div> */}
-              <div className="text-gray-700 text-sm">
+              <div className="text-gray-700 text-sm pl-1">
                 Joined:{" "}
                 {dayjs(userQuery.data.time_created).format("D MMMM YYYY")}
               </div>
             </div>
             {currentUser === name ? (
-              <div className="text-gray-700 text-sm flex flex-row items-center gap-0.5">
-                {userQuery.data.description}
-                <button>
-                  <PencilAltIcon className="h-4 w-4" />
-                </button>
-              </div>
+              <EditableDescription description={userQuery.data.description} />
             ) : (
               <div className="text-gray-700 text-sm">
                 {userQuery.data.description}
