@@ -36,7 +36,7 @@ function EditableDescription({ description }: { description: string }) {
         </div>
       ) : (
         <div className="flex flex-row items-center gap-0.5">
-          <div className="text-gray-800 text-sm py-0.5 px-1">{newDescription}</div>
+          <div className="text-gray-800 text-sm py-0.5 px-1">{newDescription || "Create a description"}</div>
           <button onClick={() => setIsEditing(true)}>
             <PencilAltIcon className="h-4 w-4 text-gray-800 hover:text-gray-500" />
           </button>

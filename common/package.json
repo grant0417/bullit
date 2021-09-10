@@ -1,0 +1,9 @@
+{
+  "name": "common",
+  "version": "1.0.1",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.4.2"
+  }
+}

@@ -25,6 +25,7 @@ RUN yarn install --prod
 RUN ls
 
 COPY --from=builder /usr/src/app/build ./build
+COPY --from=builder /usr/src/app/migrations ./migrations
 
 EXPOSE 8800
 

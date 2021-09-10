@@ -22,7 +22,7 @@ export function PostLine({ post }: { post: any }) {
   const approveMutation = useMutation(
     (id: string) => axios.post(`/api/posts/${id}/approve`),
     {
-      onSettled: (_1, _2, id) => {
+      onSettled: (_data, _error, id) => {
         queryClient.invalidateQueries(["posts", "list"]);
         queryClient.invalidateQueries(["posts", "details", id]);
       },
@@ -32,7 +32,7 @@ export function PostLine({ post }: { post: any }) {
   const deleteMutation = useMutation(
     (id: string) => axios.post(`/api/posts/${id}/delete`),
     {
-      onSettled: (_1, _2, id) => {
+      onSettled: (_data, _error, id) => {
         queryClient.invalidateQueries(["posts", "list"]);
         queryClient.invalidateQueries(["posts", "details", id]);
       },

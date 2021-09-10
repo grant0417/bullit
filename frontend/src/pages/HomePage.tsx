@@ -31,10 +31,10 @@ export function HomePage() {
         ) : (
           <>
             {postsQuery.isLoading && (
-              <div className="p-2">Loading...</div>
+              <div className="text-center p-2">Loading...</div>
             )}
             {postsQuery.isError && (
-              <div className="p-2">Error loading posts.</div>
+              <div className="text-center p-2">Error loading posts.</div>
             )}
           </>
         )}

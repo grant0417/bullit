@@ -8,9 +8,11 @@
     "esModuleInterop": true,
     "incremental": true,
     "sourceMap": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "removeComments": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src/**/*", "types/**/*"],
+  
 }

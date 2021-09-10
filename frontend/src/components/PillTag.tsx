@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-
 export function PillTag({
   tag, fontColor, bgColor,
 }: {
@@ -18,3 +17,5 @@ export function PillTag({
     </Link>
   );
 }
+
+export default PillTag;

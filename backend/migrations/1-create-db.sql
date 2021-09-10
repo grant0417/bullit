@@ -1,12 +1,14 @@
+CREATE TABLE permission (
+  id serial PRIMARY KEY,
+  name text UNIQUE
+);
+
 CREATE TABLE roles (
   id serial PRIMARY KEY,
   name text UNIQUE
 );
 
-INSERT INTO roles (name) VALUES ('user');
-INSERT INTO roles (name) VALUES ('approved');
-INSERT INTO roles (name) VALUES ('mod');
-INSERT INTO roles (name) VALUES ('admin');
+INSERT INTO roles (name) VALUES ('user'), ('approved'), ('mod'), ('admin'), ('banned');
 
 CREATE TABLE users (
   id serial PRIMARY KEY,
@@ -32,12 +34,12 @@ CREATE TABLE posts (
 
 CREATE TABLE comments (
   id serial PRIMARY KEY,
-  poster_id int REFERENCES users (id) NOT NULL,
+  parent_id int null REFERENCES comments (id),
+  commenter_id int REFERENCES users (id) NOT NULL,
   post_id int REFERENCES posts (id) NOT NULL,
   time_posted timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  parent_comment int null REFERENCES comments (id),
   body_text text NOT NULL,
-  approved bool
+  approved bool DEFAULT FALSE
 );
 
 CREATE TABLE tags (
@@ -46,7 +48,7 @@ CREATE TABLE tags (
   creator int REFERENCES users (id) NOT NULL,
   time_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   description text,
-  approved bool
+  approved bool DEFAULT FALSE
 );
 
 CREATE TABLE post_votes (

@@ -3,3 +3,5 @@
 *.log
 .env
 tsconfig.tsbuildinfo
+private.pem
+public.pem

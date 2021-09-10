@@ -1,8 +1,25 @@
-version: "3.3"
 services:
+  postgres:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
   backend:
     build: backend
     restart: always
+    depends_on: 
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      PRIVATE_PEM_FILE: /run/secrets/private.pem
+      PUBLIC_PEM_FILE: /run/secrets/public.pem
+    secrets:
+      - private_pem
+      - public_pem
   frontend:
     build: frontend
     restart: always
@@ -10,3 +27,9 @@ services:
       - backend
     ports:
       - 8080:80
+
+secrets:
+  private_pem:
+    file: ./data/private.pem
+  public_pem:
+    file: ./data/public.pem

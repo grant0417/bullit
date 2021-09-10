@@ -14,7 +14,7 @@ export function CreateUserPage() {
 
   const createUserMutataion = useMutation(
     async () => {
-      const res = await axios.post("/api/create-user", {
+      const res = await axios.post("/api/users", {
         username,
         password,
         email,
