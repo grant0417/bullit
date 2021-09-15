@@ -9,7 +9,7 @@ export function Header() {
   const username = useStore(state => state.username);
 
   return (
-    <div className="h-10 bg-usfGreen shadow flex justify-center items-center">
+    <div className="h-10 bg-blue-900 shadow flex justify-center items-center">
       <div className="max-w-4xl flex flex-row flex-1 justify-between items-center mx-2">
         <Link to="/" className="text-white font-bold text-2xl">
           {"[bullit]"}

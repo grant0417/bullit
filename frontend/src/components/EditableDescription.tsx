@@ -1,9 +1,11 @@
-import { PencilAltIcon, CheckIcon, XIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import { PencilAltIcon, CheckIcon, XIcon } from '@heroicons/react/solid';
+import axios from 'axios';
+import { useState } from 'react';
 
 function EditableDescription({ description }: { description: string }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newDescription, setNewDescription] = useState(description);
+  const [oldDescription, setOldDescription] = useState(description);
 
   return (
     <div className="sm:max-w-md">
@@ -18,6 +20,9 @@ function EditableDescription({ description }: { description: string }) {
           <div className="flex flex-row gap-1">
             <button
               onClick={() => {
+                axios.post('/api/users/description', {
+                  description: newDescription,
+                });
                 setIsEditing(false);
               }}
               className="group"
@@ -26,6 +31,7 @@ function EditableDescription({ description }: { description: string }) {
             </button>
             <button
               onClick={() => {
+                setNewDescription(oldDescription);
                 setIsEditing(false);
               }}
               className="group"
@@ -36,8 +42,15 @@ function EditableDescription({ description }: { description: string }) {
         </div>
       ) : (
         <div className="flex flex-row items-center gap-0.5">
-          <div className="text-gray-800 text-sm py-0.5 px-1">{newDescription || "Create a description"}</div>
-          <button onClick={() => setIsEditing(true)}>
+          <div className="text-gray-800 text-sm py-0.5 px-1">
+            {newDescription || 'Create a description'}
+          </div>
+          <button
+            onClick={() => {
+              setOldDescription(newDescription);
+              setIsEditing(true);
+            }}
+          >
             <PencilAltIcon className="h-4 w-4 text-gray-800 hover:text-gray-500" />
           </button>
         </div>

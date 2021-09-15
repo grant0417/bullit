@@ -1,18 +1,29 @@
-import { getDomain } from "tldjs";
-import dayjs from "dayjs";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { useParams } from "react-router-dom";
-import { useQuery } from "react-query";
-import { Votes } from "../components/Votes";
-import { UserLine } from "../components/UserLine";
-import { Comment } from "../components/Comment";
+import { getDomain } from 'tldjs';
+import dayjs from 'dayjs';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { Votes } from '../components/Votes';
+import { UserLine } from '../components/UserLine';
+import { Comment } from '../components/Comment';
+import { Formik, Form, ErrorMessage, Field } from 'formik';
+import axios from 'axios';
+import { QuestionMarkCircleIcon } from '@heroicons/react/solid';
+import useStore from '../Store';
 
 export function PostPage() {
   let { id } = useParams<{ id: string }>();
 
-  const postsQuery = useQuery(["posts", "details", id], async () => {
+  const username = useStore((state) => state.username);
+
+  const postsQuery = useQuery(['posts', 'details', id], async () => {
     const res = await fetch(`/api/posts/${id}`);
+    return await res.json();
+  });
+
+  const commentsQuery = useQuery(['posts', 'comments', id], async () => {
+    const res = await fetch(`/api/posts/${id}/comments`);
     return await res.json();
   });
 
@@ -56,8 +67,8 @@ export function PostPage() {
                     <UserLine
                       username={postsQuery.data.username}
                       role={postsQuery.data.role}
-                    />{" "}
-                    posted{" "}
+                    />{' '}
+                    posted{' '}
                     <time
                       dateTime={postsQuery.data.time_posted}
                       title={dayjs(postsQuery.data.time_posted).toString()}
@@ -77,29 +88,93 @@ export function PostPage() {
                 </div>
               )}
             </div>
-            <form
-              className="flex flex-col px-2 pt-1 pb-2 gap-1 sm:rounded sm:border bg-white"
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <label htmlFor="new-comment">New Comment</label>
-              <textarea
-                name="new-comment"
-                id="new-comment"
-                className="border-2 rounded p-1"
-              />
-              <input
-                type="submit"
-                className="place-self-end border rounded px-1 bg-gray-50 hover:bg-gray-200"
-                value="Post"
-              />
-            </form>
-            <div className="">
-              {postsQuery.data.comments.map((comment: any) => (
-                <Comment key={comment.id} comment={comment} />
-              ))}
-            </div>
+            {username && (
+              <Formik
+                initialValues={{
+                  newComment: '',
+                }}
+                validate={(values) => {
+                  const errors: any = {};
+                  if (!values.newComment) {
+                    errors.newComment = 'Required';
+                  }
+                  return errors;
+                }}
+                onSubmit={(values, { setSubmitting, setErrors }) => {
+                  axios
+                    .post(`/api/posts/${id}/comments`, {
+                      body: values.newComment,
+                    })
+                    .then(async () => {
+                      values.newComment = '';
+                      commentsQuery.refetch();
+                      setSubmitting(false);
+                    })
+                    .catch(async () => {
+                      setErrors({
+                        newComment: 'Failed to post comment',
+                      });
+                      setSubmitting(false);
+                    });
+                }}
+              >
+                {({ isSubmitting, errors }) => (
+                  <Form className="flex flex-col px-2 pt-1 pb-2 sm:rounded sm:border bg-white">
+                    <label
+                      htmlFor="newComment"
+                      className="mb-0.5 flex flex-row items-center gap-1 text-gray-800"
+                    >
+                      New Comment
+                      <div
+                        title={`Comments support Markdown syntax with the following elements:\n${[
+                          'p',
+                          'blockquote',
+                          'ul',
+                          'ol',
+                          'li',
+                          'strong',
+                          'em',
+                          'a',
+                          'img',
+                        ].join('\n')}`}
+                      >
+                        <QuestionMarkCircleIcon className="h-4 w-4" />
+                      </div>
+                    </label>
+                    <Field
+                      name="newComment"
+                      as="textarea"
+                      className={
+                        errors.newComment
+                          ? 'border-2 rounded p-1 ring-2 ring-red-600'
+                          : 'border-2 rounded p-1'
+                      }
+                    />
+                    <div className="flex flex-row-reverse justify-between w-full">
+                      <button
+                        type="submit"
+                        className="mt-1.5 border rounded px-1 bg-gray-50 hover:bg-gray-200 disabled:hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                        disabled={isSubmitting}
+                      >
+                        Post
+                      </button>
+                      <ErrorMessage
+                        name="newComment"
+                        component="div"
+                        className="text-red-600 text-sm"
+                      />
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            )}
+            {commentsQuery.data && (
+              <div>
+                {commentsQuery.data.map((comment: any) => (
+                  <Comment key={comment.id} comment={comment} />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-white sm:rounded sm:border p-4">

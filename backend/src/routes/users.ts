@@ -93,20 +93,78 @@ router.post('/', async (req: Request, res: Response) => {
   const { username, password, email } = req.body;
 
   if (!username || !password) {
-    res.status(400).send({ error: "'username' and 'password' required" });
+    res.status(400).send({
+      errorMessage: 'Username and password are required',
+      details: [
+        {
+          field: 'username',
+          message: 'Required',
+        },
+        {
+          field: 'password',
+          message: 'Required',
+        },
+      ],
+    });
     return;
   }
 
   if (password.length < 8) {
-    res.status(400).send({ error: 'Password must be at least 8 characters' });
+    res.status(400).send({
+      errorMessage: 'Password must be at least 8 characters long',
+      details: [
+        {
+          field: 'password',
+          message: 'Must be at least 8 characters long',
+        },
+      ],
+    });
     return;
+  }
+
+  if (username.length < 3) {
+    res.status(400).send({
+      errorMessage: 'Username must be at least 3 characters long',
+      details: [
+        {
+          field: 'username',
+          message: 'Must be at least 3 characters long',
+        },
+      ],
+    });
+    return;
+  }
+
+  // Validate Email
+  if (email) {
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!emailRegex.test(String(email).toLowerCase())) {
+      res.status(400).send({
+        errorMessage: 'Email is not valid',
+        details: [
+          {
+            field: 'email',
+            message: 'Must be a valid email address',
+          },
+        ],
+      });
+      return;
+    }
   }
 
   pool
     .query('SELECT 1 FROM users WHERE username = $1', [username])
     .then((result) => {
       if (result.rows.length > 0) {
-        res.status(400).send({ error: 'Username already exists' });
+        res.status(400).send({
+          errorMessage: 'Username already exists',
+          details: [
+            {
+              field: 'username',
+              message: 'Username already exists',
+            },
+          ],
+        });
       } else {
         argon2.hash(password).then((hash) => {
           pool
@@ -138,6 +196,27 @@ router.post('/', async (req: Request, res: Response) => {
     .catch((_err) => {
       res.sendStatus(500);
     });
+});
+
+router.post('/description', async (req, res) => {
+  const { description } = req.body;
+
+  if (req.user) {
+    pool
+      .query(
+        'UPDATE users SET description = $1 WHERE username = $2 RETURNING description',
+        [description, req.user.username]
+      )
+      .then((row) => {
+        console.log(row);
+        res.send(row.rows[0]);
+      })
+      .catch(() => {
+        res.sendStatus(500);
+      });
+  } else {
+    res.sendStatus(401);
+  }
 });
 
 export default router;

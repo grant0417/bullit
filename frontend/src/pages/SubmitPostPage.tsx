@@ -1,19 +1,19 @@
-import axios from "axios";
-import { Fragment, useState } from "react";
-import { useHistory } from "react-router";
-import { Tab } from "@headlessui/react";
-import { useDropzone } from "react-dropzone";
+import axios from 'axios';
+import { Fragment, useState } from 'react';
+import { useHistory } from 'react-router';
+import { Tab } from '@headlessui/react';
+import { useDropzone } from 'react-dropzone';
 
 export function SubmitPostPage() {
   const history = useHistory();
 
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [url, setUrl] = useState('');
   const [files, setFiles] = useState<any>([]);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/*",
+    accept: 'image/*',
     onDrop: (acceptedFiles) => {
       setFiles(
         acceptedFiles.map((file) =>
@@ -32,7 +32,7 @@ export function SubmitPostPage() {
           onSubmit={(e) => {
             e.preventDefault();
             axios
-              .post("/api/posts", {
+              .post('/api/posts', {
                 title,
                 body,
                 url,
@@ -67,12 +67,12 @@ export function SubmitPostPage() {
             <div className="flex flex-col">
               <Tab.Group>
                 <Tab.List className="w-full flex flex-row">
-                  {["Text", "Link", "Image"].map((type) => (
+                  {['Text', 'Link' /* "Image" */].map((type) => (
                     <Tab as={Fragment}>
                       {({ selected }) => (
                         <button
                           className={`${
-                            selected ? "bg-gray-100" : ""
+                            selected ? 'bg-gray-100' : ''
                           } rounded-t px-2 py-1 border-l-2 border-t-2 border-r-2`}
                         >
                           {type}
@@ -122,6 +122,7 @@ export function SubmitPostPage() {
                             >
                               <img
                                 src={file.preview}
+                                alt={file.name}
                                 className="max-w-20 max-h-20 border border-black"
                               />
                             </div>
@@ -135,11 +136,12 @@ export function SubmitPostPage() {
               </Tab.Group>
             </div>
 
-            <input
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline active:ring-blue-300 active:ring-2"
               type="submit"
-              value="Submit"
-              className="border rounded px-1 bg-gray-50 hover:bg-gray-200 w-20 place-self-end"
-            />
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>

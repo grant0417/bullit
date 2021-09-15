@@ -7,7 +7,9 @@ const router = express.Router();
 router.get(
   '/',
   (req: Request<{ user: string; sort: string }>, res: Response) => {
-    const { user: userQuery, sort: sortQuery } = req.query;
+    const { user: userQuery, sort: sortQuery, page } = req.query;
+
+    const pageSize = 25;
 
     let sqlColumns = [
       'posts.id',
@@ -18,6 +20,7 @@ router.get(
       'roles.name as role',
       'posts.approved',
       'COALESCE((SELECT sum(post_votes.vote_value) FROM post_votes WHERE post_votes.post_id = posts.id), 0) as votes',
+      'count(posts)'
     ];
 
     let sqlFrom =
@@ -25,7 +28,12 @@ router.get(
 
     let sqlOrder: string[] = [];
     let sqlWhere: string[] = [];
-    let sqlGroupBy: string[] = [];
+    let sqlGroupBy: string[] = ['posts.id', 'users.username', 'roles.name'];
+    let sqlLimit = pageSize + 1;
+    let sqlOffset = Number(page) * pageSize;
+    if (sqlOffset < 0) {
+      sqlOffset = 0;
+    }
 
     if (sortQuery === 'hot') {
       sqlColumns = [
@@ -79,13 +87,15 @@ router.get(
             groupBy: sqlGroupBy,
             orderBy: [...sqlOrder],
             where: [...sqlWhere, ...(userQuery ? [`users.username = $2`] : [])],
+            limit: sqlLimit,
+            offset: sqlOffset,
           }
         );
         console.log(q);
         pool
           .query(q, [req.user.username, ...(userQuery ? [userQuery] : [])])
           .then((result) => {
-            res.json(result.rows);
+            res.json({rows: result.rows.splice(0, pageSize), next: result.rows.length > 0});
           });
       } else {
         pool
@@ -104,12 +114,14 @@ router.get(
                   '(posts.approved = TRUE OR users.username = $1)',
                 ],
                 orderBy: [...sqlOrder],
+                limit: sqlLimit,
+                offset: sqlOffset,
               }
             ),
             [req.user.username, ...(userQuery ? [userQuery] : [])]
           )
           .then((result) => {
-            res.json(result.rows);
+            res.json({rows: result.rows.splice(0, pageSize), next: result.rows.length > 0});
           });
       }
     } else {
@@ -121,9 +133,11 @@ router.get(
         ],
         groupBy: sqlGroupBy,
         orderBy: [...sqlOrder],
+        limit: sqlLimit,
+        offset: sqlOffset,
       });
       pool.query(q, [...(userQuery ? [userQuery] : [])]).then((result) => {
-        res.json(result.rows);
+        res.json({rows: result.rows.splice(0, pageSize), next: result.rows.length > 0});
       });
     }
   }
@@ -343,7 +357,7 @@ router.post('/:id/vote', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/:id/comment', async (req: Request, res: Response) => {
+router.post('/:id/comments', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { parent_id, body } = req.body;
 
@@ -371,5 +385,29 @@ router.post('/:id/comment', async (req: Request, res: Response) => {
     res.sendStatus(401);
   }
 });
+
+router.get('/:id/comments', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  pool
+  .query(
+    createQuery(
+      ['comments.id', 'comments.body_text', 'comments.time_posted', 'users.username', 'roles.name as role'],
+      'comments LEFT JOIN users on (comments.commenter_id = users.id) LEFT JOIN roles on (users.role = roles.id)',
+      {
+        where: ['comments.post_id = $1'],
+        orderBy: ['comments.time_posted DESC'],
+      }
+    ),
+    [id]
+  )
+  .then((result) => {
+    res.json(result.rows);
+  }).catch((e) => {
+    console.log(e);
+    res.sendStatus(500);
+  });
+});
+
 
 export default router;
