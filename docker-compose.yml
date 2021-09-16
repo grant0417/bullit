@@ -15,8 +15,8 @@ services:
       - postgres
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-      PRIVATE_PEM_FILE: /run/secrets/private.pem
-      PUBLIC_PEM_FILE: /run/secrets/public.pem
+      PRIVATE_PEM_FILE: /run/secrets/private_pem
+      PUBLIC_PEM_FILE: /run/secrets/public_pem
     secrets:
       - private_pem
       - public_pem
@@ -33,3 +33,4 @@ secrets:
     file: ./data/private.pem
   public_pem:
     file: ./data/public.pem
+
