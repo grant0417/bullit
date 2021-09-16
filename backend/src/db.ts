@@ -8,7 +8,7 @@ let pool = new Pool({
 });
 
 export async function migrate() {
-  pool.query(`CREATE TABLE IF NOT EXISTS migrations (
+  await pool.query(`CREATE TABLE IF NOT EXISTS migrations (
                 id INTEGER PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP NOT NULL DEFAULT NOW()
