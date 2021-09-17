@@ -13,7 +13,7 @@ export function UserLine({
       {username}
       {(role === 'admin' || role === 'mod' || role === 'approved') && (
         <div title={`This user is an approved poster`}>
-          <BadgeCheckIcon className="h-4 w-4 text-blue-400" />
+          <BadgeCheckIcon className="h-4 w-4 text-blue-400" aria-label="Approved User" />
         </div>
       )}
     </Link>

@@ -29,6 +29,7 @@ export function Votes({
   return (
     <div className="flex flex-col text-center">
       <button
+        aria-label="Vote Up"
         onClick={() => {
           if (localCurrentVote === 1) {
             setLocalCurrentVote(0);
@@ -42,12 +43,13 @@ export function Votes({
           username ? (localCurrentVote === 1 ? "text-yellow-500" : "") : "text-gray-300 pointer-events-none"
         }
       >
-        <ChevronUpIcon className="h-6 w-6" />
+        <ChevronUpIcon className="h-6 w-6" aria-hidden />
       </button>
       <div>
         {votes - (currentVote ?? 0) + localCurrentVote}
       </div>
       <button
+        aria-label="Vote Down"
         onClick={() => {
           if (localCurrentVote === -1) {
             setLocalCurrentVote(0);
@@ -61,7 +63,7 @@ export function Votes({
           username ? (localCurrentVote === -1 ? "text-blue-500" : "") : "text-gray-300 pointer-events-none"
         }
       >
-        <ChevronDownIcon className="h-6 w-6" />
+        <ChevronDownIcon className="h-6 w-6" aria-hidden />
       </button>
     </div>
   );

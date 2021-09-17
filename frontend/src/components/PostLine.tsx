@@ -45,13 +45,13 @@ export function PostLine({ post }: { post: any }) {
       <div className="flex flex-col justify-center">
         <div className="flex flex-row flex-wrap gap-1 items-center">
           {(role === "admin" || role === "mod") && post.approved && (
-            <ShieldCheckIcon className="h-5 w-5 text-green-400" />
+            <ShieldCheckIcon className="h-5 w-5 text-green-400" aria-label="Approved Post" />
           )}
           {post.approved === false && (
             <>
-              <a data-tip="This post is pending approval.">
-                <ShieldExclamationIcon className="h-5 w-5 text-yellow-400" />
-              </a>
+              <p data-tip="This post is pending approval.">
+                <ShieldExclamationIcon className="h-5 w-5 text-yellow-400" aria-label="Pending Approval Post" />
+              </p>
               <ReactTooltip place="top" type="dark" effect="solid" />
             </>
           )}
@@ -101,7 +101,7 @@ export function PostLine({ post }: { post: any }) {
             to={`/p/${post.id}`}
             className="flex flex-row items-center gap-1 group max-w-max"
           >
-            <ChatAlt2Icon className="h-4 w-4 text-gray-700 group-hover:text-gray-500" />
+            <ChatAlt2Icon className="h-4 w-4 text-gray-700 group-hover:text-gray-500" aria-label="Comments" />
             <div className="text-sm text-gray-700 group-hover:text-gray-500">
               Comments
             </div>

@@ -6,7 +6,7 @@ import argon2 from 'argon2';
 import cookieParser from 'cookie-parser';
 import pool, { migrate } from './db';
 import authMiddleware from './middleware/authMiddleware';
-import { createJwt, setJwtCookie } from './jwt';
+import { setJwtCookie } from './jwt';
 import posts from './routes/posts';
 import users from './routes/users';
 
