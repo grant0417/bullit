@@ -1,5 +1,6 @@
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
+import { Response } from 'express';
 
 const privKey = fs.readFileSync(
   process.env.PRIVATE_PEM_FILE || './private.pem',
@@ -32,5 +33,19 @@ export async function verifyJwt(token: string): Promise<string> {
         }
       }
     );
+  });
+}
+
+export async function setJwtCookie(res: Response, username: string): Promise<void> {
+  const token = await createJwt(username);
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000),
+  });
+  res.cookie('username', username, {
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000),
   });
 }

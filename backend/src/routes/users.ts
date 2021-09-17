@@ -2,7 +2,7 @@ import createQuery from '../createQuery';
 import pool from '../db';
 import express, { Request, Response } from 'express';
 import argon2 from 'argon2';
-import { createJwt } from '../jwt';
+import { createJwt, setJwtCookie } from '../jwt';
 
 const router = express.Router();
 
@@ -51,7 +51,7 @@ router.get('/:name/role', async (req, res) => {
         res.send(result.rows[0]);
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.sendStatus(500);
     });
 });
@@ -171,28 +171,14 @@ router.post('/', async (req: Request, res: Response) => {
               'INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3)',
               [username, hash, email]
             )
-            .then(() => {
-              const token = createJwt(username);
-
-              res.cookie('token', token, {
-                httpOnly: true,
-                sameSite: 'strict',
-                // secure: true,
-                expires: new Date(
-                  Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000
-                ),
-              });
-              res.cookie('username', username, {
-                expires: new Date(
-                  Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000
-                ),
-              });
+            .then(async () => {
+              await setJwtCookie(res, username);
               res.send({ username, role: 'user' });
             });
         });
       }
     })
-    .catch((_err) => {
+    .catch(() => {
       res.sendStatus(500);
     });
 });

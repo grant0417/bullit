@@ -6,7 +6,7 @@ import argon2 from 'argon2';
 import cookieParser from 'cookie-parser';
 import pool, { migrate } from './db';
 import authMiddleware from './middleware/authMiddleware';
-import { createJwt } from './jwt';
+import { createJwt, setJwtCookie } from './jwt';
 import posts from './routes/posts';
 import users from './routes/users';
 
@@ -54,17 +54,7 @@ async function startApp(port: number) {
           return;
         }
 
-        const token = await createJwt(username);
-
-        res.cookie('token', token, {
-          httpOnly: true,
-          sameSite: 'strict',
-          // secure: true,
-          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000),
-        });
-        res.cookie('username', username, {
-          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 - 30000),
-        });
+        await setJwtCookie(res, username);
         res.send({ username, role: sqlResult.rows[0].role });
       })
       .catch((e) => {
