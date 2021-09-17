@@ -124,7 +124,7 @@ export function PostPage() {
                       htmlFor="newComment"
                       className="mb-0.5 flex flex-row items-center gap-1 text-gray-800"
                     >
-                      New Comment
+                      {'New Comment'}
                       <div
                         title={`Comments support Markdown syntax with the following elements:\n${[
                           'p',

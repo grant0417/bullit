@@ -8,7 +8,6 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { Votes } from "./Votes";
 import { UserLine } from "./UserLine";
-import { PillTag } from "./PillTag";
 import useStore from "../Store";
 import axios from "axios";
 import { useMutation } from "react-query";
@@ -103,7 +102,7 @@ export function PostLine({ post }: { post: any }) {
           >
             <ChatAlt2Icon className="h-4 w-4 text-gray-700 group-hover:text-gray-500" aria-label="Comments" />
             <div className="text-sm text-gray-700 group-hover:text-gray-500">
-              Comments
+              {post.comments} {post.comments === 1 ? 'comments': 'comments'} 
             </div>
           </Link>
           {post.approved === false && (role === "admin" || role === "mod") && (

@@ -4,6 +4,7 @@ import { useMutation } from 'react-query';
 import axios from 'axios';
 import useStore from '../Store';
 import { ErrorMessage, Formik } from 'formik';
+import { QuestionMarkCircleIcon } from '@heroicons/react/solid';
 
 export function CreateUserPage() {
   const history = useHistory();
@@ -42,30 +43,29 @@ export function CreateUserPage() {
           initialValues={{ username: '', password: '', email: '' }}
           validate={(values) => {
             const errors: any = {};
-            if (!values.username) {
-              errors.username = 'Required';
-            }
-
             if (values.username.length < 3) {
               errors.username = 'Must be at least 3 characters';
             }
 
-            if (!values.password) {
-              errors.password = 'Required';
+            if (!values.username) {
+              errors.username = 'Required';
             }
 
             if (values.password.length < 8) {
               errors.password = 'Must be at least 8 characters';
             }
 
+            if (!values.password) {
+              errors.password = 'Required';
+            }
+
             const emailRegex =
               /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-            if (!values.email) {
-              errors.email = 'Required';
-            } else if (!emailRegex.test(values.email)) {
+            if (values.email && emailRegex.test(values.email)) {
               errors.email = 'Invalid email';
             }
+
             return errors;
           }}
           onSubmit={(values, { setErrors, setSubmitting }) => {
@@ -133,12 +133,15 @@ export function CreateUserPage() {
               </div>
               <div>
                 <label
-                  className="block mb-2 flex flex-row gap-2"
+                  className="block mb-2 flex flex-row gap-2 items-center"
                   htmlFor="password"
                 >
                   <div className="text-gray-700 text-sm font-bold">
                     Password
                   </div>
+                  {/* <div>
+                    <QuestionMarkCircleIcon className="text-gray-700 w-4 h-4" />
+                  </div> */}
                   <ErrorMessage
                     name="password"
                     component="div"
@@ -160,10 +163,15 @@ export function CreateUserPage() {
               </div>
               <div>
                 <label
-                  className="block mb-2 flex flex-row gap-2"
+                  className="block mb-2 flex flex-row gap-2 items-center"
                   htmlFor="email"
                 >
-                  <div className="text-gray-700 text-sm font-bold">Email</div>
+                  <div className="text-gray-700 text-sm">
+                    <span className="font-bold">Email</span> (Optional)
+                  </div>
+                  <div title="You're email will only be used for password recovery">
+                    <QuestionMarkCircleIcon className="text-gray-700 w-4 h-4" />
+                  </div>
                   <ErrorMessage
                     name="email"
                     component="div"
