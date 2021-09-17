@@ -56,37 +56,37 @@ router.get('/:name/role', async (req, res) => {
     });
 });
 
-router.post('/:name/role', async (req, res) => {
-  const { role } = req.body;
-  const { name } = req.params;
+// router.post('/:name/role', async (req, res) => {
+//   const { role } = req.body;
+//   const { name } = req.params;
 
-  pool
-    .connect()
-    .then(async (client) => {
-      client
-        .query(createQuery(['id'], 'roles', { where: ['name = $1'] }), [role])
-        .then(async (result) => {
-          if (result.rows.length === 0) {
-            res.status(404).send({ error: 'Role not found' });
-          } else {
-            client
-              .query('UPDATE users SET role = $1 WHERE username = $2', [
-                result.rows[0].id,
-                name,
-              ])
-              .then(() => {
-                res.sendStatus(200);
-              });
-          }
-        })
-        .finally(() => {
-          client.release();
-        });
-    })
-    .catch((err) => {
-      res.sendStatus(500);
-    });
-});
+//   pool
+//     .connect()
+//     .then(async (client) => {
+//       client
+//         .query(createQuery(['id'], 'roles', { where: ['name = $1'] }), [role])
+//         .then(async (result) => {
+//           if (result.rows.length === 0) {
+//             res.status(404).send({ error: 'Role not found' });
+//           } else {
+//             client
+//               .query('UPDATE users SET role = $1 WHERE username = $2', [
+//                 result.rows[0].id,
+//                 name,
+//               ])
+//               .then(() => {
+//                 res.sendStatus(200);
+//               });
+//           }
+//         })
+//         .finally(() => {
+//           client.release();
+//         });
+//     })
+//     .catch(() => {
+//       res.sendStatus(500);
+//     });
+// });
 
 router.post('/', async (req: Request, res: Response) => {
   const { username, password, email } = req.body;

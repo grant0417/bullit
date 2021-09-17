@@ -20,14 +20,14 @@ router.get(
       'roles.name as role',
       'posts.approved',
       'COALESCE((SELECT sum(post_votes.vote_value) FROM post_votes WHERE post_votes.post_id = posts.id), 0) as votes',
-      'count(posts)'
+      'COUNT(*) as comments',
     ];
 
     let sqlFrom =
-      'posts LEFT JOIN users on (posts.poster_id = users.id) LEFT JOIN roles on (users.role = roles.id)';
+      'posts LEFT JOIN users on (posts.poster_id = users.id) LEFT JOIN roles on (users.role = roles.id) LEFT JOIN comments on (posts.id = comments.post_id)';
 
     let sqlOrder: string[] = [];
-    let sqlWhere: string[] = [];
+    let sqlWhere: string[] = ['posts.deleted = false'];
     let sqlGroupBy: string[] = ['posts.id', 'users.username', 'roles.name'];
     let sqlLimit = pageSize + 1;
     let sqlOffset = Number(page) * pageSize;
@@ -185,6 +185,10 @@ router.get('/:id', (req: Request, res: Response) => {
     'COALESCE((SELECT sum(post_votes.vote_value) FROM post_votes WHERE post_votes.post_id = posts.id), 0) as votes',
   ];
 
+  const sqlWhere = [
+    'posts.deleted = false',
+  ];
+
   if (req.user) {
     if (req.user.role === 'admin' || req.user.role === 'mod') {
       pool
@@ -197,7 +201,7 @@ router.get('/:id', (req: Request, res: Response) => {
             ],
             'posts LEFT JOIN users on (posts.poster_id = users.id) LEFT JOIN roles on (users.role = roles.id)',
             {
-              where: ['posts.id = $2'],
+              where: [...sqlWhere, 'posts.id = $2'],
             }
           ),
           [req.user.username, id]
@@ -220,6 +224,7 @@ router.get('/:id', (req: Request, res: Response) => {
             'posts LEFT JOIN users on (posts.poster_id = users.id) LEFT JOIN roles on (users.role = roles.id)',
             {
               where: [
+                ...sqlWhere,
                 '(posts.approved = TRUE or users.username = $1) AND posts.id = $2',
               ],
             }
@@ -241,7 +246,7 @@ router.get('/:id', (req: Request, res: Response) => {
           [...sqlColumns],
           'posts LEFT JOIN users on (posts.poster_id = users.id) LEFT JOIN roles on (users.role = roles.id)',
           {
-            where: ['posts.approved = TRUE AND posts.id = $1'],
+            where: [...sqlWhere, 'posts.approved = TRUE AND posts.id = $1'],
           }
         ),
         [id]
@@ -284,7 +289,7 @@ router.post('/:id/delete', async (req: Request, res: Response) => {
   if (req.user) {
     if (req.user.role === 'admin' || req.user.role === 'mod') {
       pool
-        .query('DELETE FROM posts WHERE id = $1', [id])
+        .query('UPDATE posts SET deleted = true WHERE id = $1', [id])
         .then(() => {
           res.sendStatus(200);
         })
@@ -295,7 +300,7 @@ router.post('/:id/delete', async (req: Request, res: Response) => {
     } else {
       pool
         .query(
-          'DELETE FROM posts WHERE id = $1 AND poster_id = (SELECT id FROM users WHERE username = $2) RETURNING id',
+          'UPDATE posts SET deleted = true WHERE id = $1 AND poster_id = (SELECT id FROM users WHERE username = $2) RETURNING id',
           [id, req.user.username]
         )
         .then((post_id) => {
@@ -395,7 +400,7 @@ router.get('/:id/comments', async (req: Request, res: Response) => {
       ['comments.id', 'comments.body_text', 'comments.time_posted', 'users.username', 'roles.name as role'],
       'comments LEFT JOIN users on (comments.commenter_id = users.id) LEFT JOIN roles on (users.role = roles.id)',
       {
-        where: ['comments.post_id = $1'],
+        where: ['comments.post_id = $1', 'comments.deleted = false'],
         orderBy: ['comments.time_posted DESC'],
       }
     ),

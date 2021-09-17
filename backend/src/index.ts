@@ -9,6 +9,7 @@ import authMiddleware from './middleware/authMiddleware';
 import { setJwtCookie } from './jwt';
 import posts from './routes/posts';
 import users from './routes/users';
+import tags from './routes/tags';
 
 async function startApp(port: number) {
   const app = express();
@@ -21,6 +22,7 @@ async function startApp(port: number) {
 
   app.use('/api/posts', posts);
   app.use('/api/users', users);
+  app.use('/api/tags', tags);
 
   app.post('/api/login', (req: Request, res: Response) => {
     const { username, password } = req.body;
