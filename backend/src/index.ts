@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import express, { Response, Request } from 'express';
+import helmet from 'helmet';
 import argon2 from 'argon2';
 import cookieParser from 'cookie-parser';
 import pool, { migrate } from './db';
@@ -12,6 +13,7 @@ import users from './routes/users';
 async function startApp(port: number) {
   const app = express();
 
+  app.use(helmet());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
