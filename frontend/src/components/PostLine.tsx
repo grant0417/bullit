@@ -56,10 +56,10 @@ export function PostLine({ post }: { post: any }) {
             </>
           )}
           <div>
-            {post.url ? (
+            {post.url_link ? (
               <a
                 className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                href={post.url}
+                href={post.url_link}
               >
                 {post.title}
               </a>
@@ -76,12 +76,12 @@ export function PostLine({ post }: { post: any }) {
           <PillTag tag="typescript" fontColor="red" bgColor="#ffeecc" />
           <PillTag tag="c++" fontColor="gray" bgColor="#ddddff" /> */}
 
-          {post.url && (
+          {post.url_link && (
             <a
-              href={`/site/${getDomain(post.url)}`}
+              href={`/site/${getDomain(post.url_link)}`}
               className="text-sm text-gray-700"
             >
-              (<span className="underline">{getDomain(post.url)}</span>)
+              (<span className="underline">{getDomain(post.url_link)}</span>)
             </a>
           )}
         </div>
