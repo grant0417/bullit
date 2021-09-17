@@ -1,6 +1,6 @@
 # [[bullit]](https://bullit.org)
 
-A Reddit/Hacker New like site, currently supports permissioned users, comments, text and url posts.
+A Reddit/Hacker News like site, currently supports permissioned users, comments, text and url posts.
 
 ## Deploying
 
