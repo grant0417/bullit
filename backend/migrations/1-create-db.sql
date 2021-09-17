@@ -17,8 +17,7 @@ CREATE TABLE users (
   email text,
   description text,
   role int REFERENCES roles (id) DEFAULT 1,
-  time_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  graduation_semester text
+  time_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE posts (

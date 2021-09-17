@@ -40,10 +40,7 @@ export function UserPage() {
                   </div>
                 )}
               </div>
-              {/* <div className="text-gray-700">
-                      Graduation Semester: {dayjs(postsQuery.data.time_created).format( "MMMM YYYY")}
-                    </div> */}
-              <div className="text-gray-700 text-sm pl-1">
+              <div className="text-gray-800 text-sm pl-1">
                 Joined:{' '}
                 {dayjs(userQuery.data.time_created).format('D MMMM YYYY')}
               </div>
@@ -51,7 +48,7 @@ export function UserPage() {
             {currentUser === name ? (
               <EditableDescription description={userQuery.data.description} />
             ) : (
-              <div className="text-gray-700 text-sm pl-1">
+              <div className="text-gray-800 text-sm pl-1">
                 {userQuery.data.description}
               </div>
             )}

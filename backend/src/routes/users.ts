@@ -13,7 +13,6 @@ router.get('/:name', async (req: Request, res: Response) => {
         'users.username',
         'users.description',
         'users.time_created',
-        'users.graduation_semester',
         'roles.name as role',
       ],
       'users LEFT JOIN roles on (users.role = roles.id)',
